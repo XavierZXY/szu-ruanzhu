@@ -1,0 +1,142 @@
+\section{Related Work}
+% execution sequences
+% recalibrate
+% multitask scheduling and processing
+ % All-in-one models, though capable of handling multiple tasks, typically support only a limited range and often produce overly smooth, low-fidelity outcomes due to their broad data distribution fitting. 
+ % RestoreAgent -> AgenticIR -> MAIR -> HybridAgent -> Qagent -> JarvisIR -> 4kagent.
+ % toolbox to progressively restore the quality of a corrupted image.
+ % Besides, Yu et al. (2018) and Chen et al. (2024a) invoke multiple single-degradation restoration tools to address multiple degradations and thus are somewhat similar to our work. But Yu et al. (2018) employ reinforcement learning (RL) while Chen et al. (2024a) fine-tune a VLM to directly give an execution plan, not so agentic as ours. Besides, their preoccupation is not combining existing tools as our work.
+
+% These works demonstrate the growing potential of combining general-purpose language intelligence with visual tools for robust, adaptive image restoration. 
+
+ %Yu et al. propose RL-Restore 
+
+% 这些工作引入VLM去预测图像中的噪声，同时给出初步的模型的选择和执行序列。但是往往会依赖post searching的方式recalibrate方案。
+ %RestoreAgent 
+ % How to overcome these limitations, fully leverage the wide array of state-of-the-art models for different tasks available on the market, and determine the optimal execution sequence of image restoration tasks and the most suitable model for specific degradation pattern remain unexplored. This gap presents a significant opportunity for future research in intelligent image restoration systems. 
+ % RestoreAgent [9] involves fine-tuning a vision-language model (VLM) using synthetic datasets to directly produce an execution plan. 
+ % RestoreAgent [22] pioneered the use of MLLMs for autonomous task identification, model selection, and execution planning. 
+ % 是agentIR的开创性工作，通过rollback机制不断优化predefined的顺序和tools，证明了多任务场景下任务执行顺序和模型选择的重要性。
+ % 我们的paper可以用。。。openreview种的话例如，在JPEG压缩/模糊之前添加噪声会改变噪声的特性，使其因压缩/模糊效果而变得更加平滑。相反，在噪声之前添加JPEG压缩/模糊则不会改变噪声的特性。这些降级处理之间的相互作用会根据其应用顺序产生不同的模式。MLLM可以通过这些降级模式识别不同的任务序列。。
+ 
+ %AgenticIR 进一步把agent system变得更智能，通过总结usage experience of the diverse tools，来
+ % The agent first actively explores actual scenarios to accumulate experience and summarize this experience into referenceable documents for future reasoning. 
+ % LLMs alone fail to grasp the intricate interactions among operations and thus cannot plan reliably. To address it, we let the agent self-explore beforehand and then summarize the accumulated experience to distill knowledge. The knowledge will be a concrete ground for planning in inference.
+ % Statistics (Experience) Documents (Knowledge) VLM evaluate LLM Successful rates: summarize ······ First deblur then deJPEG: 72% First deJPEG then deblur: 80% ······ Deblur tool 1 + DeJPEG tool 1 DeJPEG tool 3 + Deblur tool 2 Deblur tool 1 + DeJPEG tool 2 DeJPEG tool 1 + Deblur tool 1 ······ Input Retrieved Referring to document in inference
+ % obtain comprehensive prior knowledge and minimize human subjective judgment, we propose a method of self-exploration and summarization, as illustrated in Fig. 4. The agent first actively explores actual scenarios to accumulate experience and summarize this experience into referenceable documents for future reasoning. Specifically, for some images with complex degradations, we apply all possible sequences of the corresponding tools and use the fine-tuned DepictQA to evaluate the restored images, determining whether the restoration is successful. We calculate the success rate of each operation sequence. After collecting these statistics, we prompt GPT-4 to summarize them and store the results in a knowledge base, which will be retrieved during reasoning to assist in operation scheduling.
+ % But Yu et al. (2018) employ reinforcement learning (RL) while Chen et al. (2024a) （就是restoreagent） fine-tune a VLM to directly give an execution plan, not so agentic as ours. Besides, their preoccupation is not combining existing tools as our work. AgenticIR [101] leverages two off-the-shelf LLMs and VLMs to achieve the scheduling of restoration tools on the synthetic experiment platform. % AgenticIR [269] introduced a five-stage human-inspired workflow—Perception, Scheduling, Execution, Reflection, and Rescheduling—augmented with self-exploration to build IR-specific experience. 
+
+ % Qagent: 尝试去加速post searching的效率，通过引入no-reference IQA metrics to guide greedy search strategy。虽然相比depth-first-search把时间复杂度大幅度降低到O（n^2）,n是降质types的数量，但是在系统开始时仍然需要看到所有types的处理结果，才能进行下一次决定。当图像遭受更多的降质类型时，时间开销会呈指数增加。
+ 
+
+ % QAgent [267] further introduces a quality-driven chain-of-thought framework, leveraging  restoration without costly rollbacks. 
+
+ 
+ % MAIR [79] advanced this by employing a multi-agent system guided by real-world degradation priors, improving both efficiency and scalability. 
+ % MAIR假设退化顺序可以按照真实世界的添加顺序进行恢复，并为对于每一个degrdataion types设计了一个task-specific专家。
+ 
+ %HybridAgent 实现了与用户交互的agentir系统，根据用户的意图的IR要求在fast route和slow route切换。
+
+  %4kagent 进一步扩大了工具的数量和应用的场景，但是post searching的策略依然在Joint restoration场景带来了庞大的inference time，限制了它的应用性。
+
+ 
+ % Nevertheless, the aforementioned works all perform image restoration through step-by-step execution, neglecting the entanglement of distortions and potential distribution shift caused by different restoration models [6, 31]. Moreover, they do not account for efficiency during tool invocation. How to adaptively and efficiently select restoration tools based on different user prompts remains an open research question.
+ % HybridAgent [102] proposed a hybrid interaction scheme with fast and slow agents, along with a mixed-distortion removal strategy to mitigate error propagation. 
+ 
+ %
+ 
+ %JarvisIR
+% More recently, JarvisIR [122] and JarvisArt [123] leveraged intelligent agent workflows to perform task-oriented image restoration and creative photo retouching.
+% 工具的选择是由github和hugginface的描述决定的，这显然并不是最优的选择。
+
+\subsection{Traditional Image Restoration}
+Image restoration has achieved remarkable progress in handling various task-specific degradations, such as denoising~\cite{zhang2023practical,chen2023masked}, dehazing~\cite{wu2023ridcp,jin2022structure,lin2024nighthaze}, desnowing~\cite{chen2021all,cheng2023snow,Chen_2023_ICCV}, deraining~\cite{xiao2022image,chen2023learning,chen2023sparse}, super-resolution~\cite{dong2015image,wang2021real,chen2024low,wang2024exploiting,sun2024coser}, and deblurring~\cite{tsai2022stripformer,chen2023hierarchical}.
+These methods provide many insightful solutions and analyses in network design, training strategies, and evaluation metrics.
+However, such specialization often comes at the cost of generalization, as models are typically trained on synthetic image pairs with specific degradation types, leading to suboptimal performance in real-world scenarios that involve complex and unknown degradations.
+To overcome this limitation, researchers have increasingly turned their attention to All-in-One models~\cite{surveygenir}, aiming to develop a unified framework capable of effectively handling diverse degradation types.
+On one hand, some methods focus on continual learning, such as employing multi-task learning~\cite{wu2024harmony,zhang2023ingredient} and sequential learning~\cite{kong2024towards} to mitigate catastrophic forgetting during training.
+On the other hand, some methods emphasize architectural innovations, including mixture-of-experts structures~\cite{yu2024multi}, reusable pretrained backbones with task-specific heads~\cite{chen2020pre}, and the incorporation of diffusion priors~\cite{kong2025dual} for restoration. 
+These strategies have greatly facilitated the practical deployment of image restoration models in real-world applications.
+However, a single unified model still struggles to fit the complex mixtures of degradation distributions and tends to produce overly smooth results when applied to scenarios beyond its intended scope.
+
+\subsection{Agentic Image Restoration}
+Inspired by the remarkable progress of Multimodal Large Language Models (MLMMs) in visual understanding and reasoning, agentic image restoration (IR) systems have emerged as a new paradigm. 
+% The key idea is to leverage existing task-specific restoration tools to restore images with complex degradations in a step-by-step manner, where an LMM serves as a central controller that reasons about degradation types and plans the execution sequence of these tools. 
+RestoreAgent~\cite{chen2024restoreagent} serves as a pioneering work, introducing a fine-tuned Llava-Llama3-8B model to analyze degradations and plan restoration sequences. It further incorporates a rollback mechanism to recalibrate predefined execution orders, demonstrating the critical importance of task ordering in multi-degradation scenarios.
+AgenticIR~\cite{zhu2024intelligent} enhances the reliability of planning by summarizing accumulated experiences as reference documents that guide large language model (LLM) reasoning.
+4KAgent~\cite{zuo20254kagent} further expands the toolbox and adapts the system for more practical real-world scenarios. 
+These systems typically consist of two stages:
+(1) using LMMs, or a combination of LMMs and LLMs, for degradation reasoning and restoration planning of the tool execution sequence; and
+(2) employing a depth-first search mechanism guided by the final restoration quality to progressively refine the execution sequence generated in (1).
+However, such post-search refinement is impractical for real-world deployment, as it requires numerous trial-and-error attempts to search for an optimal planning route, resulting in considerable time overhead. To overcome this efficiency bottleneck, recent studies have focused on developing efficient Agentic IR systems.
+HybridAgent~\cite{li2025hybrid} introduces user interaction to flexibly switch between fast and slow restoration routes based on user intent.
+MAIR~\cite{jiang2025multi} removes the planning stage of execution under the assumption that the optimal restoration sequence can be approximated by reversing the real-world degradation order.
+Q-Agent~\cite{zhou2025q} employs no-reference image quality assessment metrics to guide a greedy search strategy. Equipping LMMs with both degradation reasoning and tool-execution capabilities is crucial for reducing time complexity to a linear scale but remains underexplored. A few studies, such as Yu~\textit{et al.}~\cite{yu2018crafting} and Lin~\textit{et al.}~\cite{lin2025jarvisir}, have also explored intelligent tool utilization in image restoration, sharing similar motivations with ours.
+However, Yu \textit{et al.}~\cite{yu2018crafting} train multiple small networks for three degradation types without integrating existing tools, while Lin \textit{et al.}~\cite{lin2025jarvisir} focus on task-oriented image restoration and rely on~\cite{chen2024restoreagent} to generate restoration orders for supervised fine-tuning, which requires extensive preprocessing and limits scalability.
+
+ % However, it still incurs high computational cost in the early stages, since the system must evaluate all restoration results before making subsequent decisions. The complexity increases exponentially as the number of degradation types grows. 
+% , reducing the time complexity to $O(n^2)$, where n denotes the number of degradation types. 
+% The computational cost increases exponentially when handling more degradation types. 
+
+
+% 是agentIR的开创性工作，通过rollback机制不断优化predefined的顺序和tools，证明了多任务场景下任务执行顺序和模型选择的重要性。
+ % 我们的paper可以用。。。openreview种的话例如，在JPEG压缩/模糊之前添加噪声会改变噪声的特性，使其因压缩/模糊效果而变得更加平滑。相反，在噪声之前添加JPEG压缩/模糊则不会改变噪声的特性。这些降级处理之间的相互作用会根据其应用顺序产生不同的模式。MLLM可以通过这些降级模式识别不同的任务序列。。
+
+% typically support only a limited range and often produce overly smooth, low-fidelity outcomes due to their broad data distribution fitting. 
+
+% Within this field, Prompt Learning has become a key improvement technique \cite{potlapalli2023promptir, zhou2022learning}. However, real-world restoration is inherently a multi-step, dynamic process. The single-step, feed-forward nature of existing prompt-based methods limits their flexibility against complex or unseen mixed degradations.  
+
+% \subsection{All-in-One Image Restoration}
+
+
+% \subsection{Agentic Image Restoration}
+
+
+% This has motivated the introduction of intelligent Agents to the field \cite{chen2024restoreagent,zhu2024intelligent}. By framing restoration as a sequential decision-making problem, an agent can dynamically perceive the image's degradation state and execute a learned policy of restorative actions. This iterative \textbf{diagnose-and-treat} methodology offers a more generalizable and interpretable solution, capable of navigating the complexities of the AiOIR challenge.
+
+%-------------------------------------------------------------------------
+
+\subsection{Tool-integrated Agent Reinforcement Learning}
+% llm-based tool-integrated rl, including python interpreter、search engine for reason、math
+% multimodel-based integrate crop-and-zoom to achieve tho goal of think-with-image
+% 
+The advent of Large Language Models(LLM) agents marks a significant evolution in artificial intelligence, characterized by their capabilities for autonomous planning, decision-making, and interaction with their environment~\cite{qu2025tool}. Critically, the tool-integrated reinforcement learning (TIR) has emerged as a powerful paradigm for developing highly adaptive and robust LLM agents. In this paradigm, ~\cite{searchr1,r1search,agentrlscaling,xue2025simpletir} have investigated a range of tasks, such as employing a code interpreter for mathematical reasoning and a search engine for information retrieval. Furthermore, more and more works are extending TIR to MLLM domain. For instance, ~\cite{su2025openthinkimg, zhang2025thyme, wang2025vrag} empower models with the ability to "think with images" by integrating tools like a crop-zoom mechanism or a code execution sandbox. ~\cite{wang2025vrag} leverages search engines to equip models with long-horizon information gathering capabilities. Despite this progress, the application of VLMs combined with RL to the specialized domain of image restoration remains largely unexplored. Unlike tasks above involving discrete tool calls, image restoration is an inherently sequential process. It requires a carefully chosen cascade of operators - such as deblurring, or denoising, where the outcome of one step directly informs the selection and parameterization of the next. 
+Our work is two-fold. First, we define a comprehensive action space composed of diverse image operators to ensure both breadth and efficacy. Second, we introduce a novel composite reward signal that synergistically combines step-wise improvements in perceptual quality with rewards tailored to specific degradation types.
+
+% addresses the challenges of applying TIR to this domain through formulating a vast and effective action space of image operators, and combining step-wise quality rewards and degradation-type rewards.
+% LMM-based agents are driving a paradigm shift from passive visual perception to active, multi-step decision-making and tool utilization. For instance, VisProg~\cite{gupta2023visual} leverages in-context learning (ICL)~\cite{Brown2020LanguageMA} to compile natural language instructions into modular, executable programs. However, ICL’s reliance on text-only prompts proves inefficient for multimodal tool selection, motivating a transition toward data-driven fine-tuning.
+% To this end, MAT~\cite{gao2024multi} introduced a data synthesis pipeline to construct the large-scale MM-Traj dataset. Subsequent supervised fine-tuning (SFT) via trajectory tuning on this dataset yielded the T3-agent, endowing VLMs with robust tool-use capabilities. GUI Agents~\cite{niu2024screenagent,Hong2023CogAgentAV} further implemented a planning, acting, and reflecting loop, enabling VLM-driven control over dynamic graphical user interfaces (GUIs).
+% Despite their success, SFT-based methods heavily rely on static, expert-curated datasets, which struggle to cover the diversity of real-world degradations. Moreover, both ICL- and SFT-based paradigms lack a mechanism for optimizing cumulative objectives through exploration and feedback. Reinforcement learning (RL) offers a more principled framework for sequential decision-making. However, applying RL to large VLMs remains challenging due to training instability and sample inefficiency.
+% Recent advances in policy optimization begin to address these issues. For example, Generative Rehearsal with Policy Optimization (GRPO)~\cite{Shao2024DeepSeekMathPT} leverages generative rehearsal to improve data efficiency and stabilize policy updates. The integration of RL with VLMs has shown great potential in developing generalist agents. VTool-R1~\cite{wu2025vtool}, for instance, employs RL to refine VLM-based tool selection. Furthermore, R1-VL~\cite{Zhang2025R1VLLT} demonstrates that RL-trained agents can outperform SFT-only counterparts in complex planning and execution tasks.
+% Despite this progress, the application of VLMs combined with RL to the specialized domain of image restoration remains largely unexplored.
+
+% \subsection{General Agentic System with LMMs}
+% Recent advancements in LMMs agents mark a significant paradigm shift, moving from passive visual perception to active, multi-step decision-making and tool manipulation. VisProg \cite{gupta2023visual} demonstrated that a VLMs, without task-specific training, could leverage in-context learning (ICL) \cite{Brown2020LanguageMA} to compile natural language instructions into modular, executable Python-like programs.
+% However, ICL's reliance on text-only prompts proved inefficient for multimodal tool selection.This propelled the shift to data-driven tuning. MAT \cite{gao2024multi} innovating a data synthesis pipeline to create the large-scale MM-Traj dataset. Subsequent Supervised Fine-Tuning (SFT) via trajectory tuning created the T3-agent, which instilled robust tool-use capabilities directly into the VLMs. GUI Agents \cite{niu2024screenagent,Hong2023CogAgentAV} implements a planning-acting-reflecting loop, enabling VLM-driven control of dynamic computer GUIs. SFT relies heavily on static, expert-curated datasets, which struggle to cover the diversity of real-world degradations. Both methods lack a mechanism for optimizing a cumulative goal through exploration and feedback. Reinforcement Learning (RL) offers a more robust framework for training agents in sequential decision-making. However, applying RL to large VLMs is challenging due to training instability and sample inefficiency. Advanced policy optimization algorithms, such as Generative Rehearsal with Policy Optimization(GRPO) \cite{Shao2024DeepSeekMathPT}, address this by using generative rehearsal to improve data efficiency and stabilize policy updates. The VLM+RL paradigm has shown significant promise in generalist agent tasks. VTool-R1  \cite{wu2025vtool} demonstrated using RL to refine VLM tool selection, while R1-VL \cite{Zhang2025R1VLLT} showed that RL-trained agents can surpass SFT-only models in complex planning and execution. Despite this progress, the application of VLM wiht RL to the specialized domain of IR remains nascent. 
+
+
+% Initial agent-based image restoration works focused on mitigating heavy training requirements. RestoreAgent \cite{chen2024restoreagent} presented a general framework to handle complex degradation. Subsequently, AgenticIR \cite{zhu2024intelligent} pioneered a multi-stage, human-like problem-solving approach, though it relied on a complex architecture of separate vision and language models. Contemporaneously, JarvisIR \cite{lin2025jarvisir} also used a  VLMs as a central controller but adopted a Data-Driven Tuning path. This approach required extensive SFT trajectory data, which was supplied by its comprehensive CleanBench dataset. However, the trajectory is distilled from RestoreAgent \cite{chen2024restoreagent}, which consequently limited its generalizability outside the scope of its training data. More recent work extends this paradigm to specific high-stakes applications.4KAgent \cite{zuo20254kagent} focuses on the complex task of super-resolving diverse real-world images to 4K quality. It demonstrates using an agent to manage the intricate, multi-step process of upscaling, artifact suppression, and detail generation in a planned sequence.
+
+%-------------------------------------------------------------------------
+
+% \subsection{VLMs with Reinforcement Learning}
+
+% While SFT and  ICL provide foundational capabilities for VLM agents \cite{lin2025jarvisir, zuo20254kagent, chen2024restoreagent, zhu2024intelligent}, they face inherent limitations. 
+% \textit{Despite this progress, the application of VLM wiht RL to the specialized domain of IR remains nascent. Existing IR agents are primarily trained with SFT, relying on passive imitation rather than active policy optimization. They cannot dynamically adapt their "diagnose-and-treat" strategy based on intermediate restoration quality. This presents the gap our work addresses. We argue that AiOIR is fundamentally a sequential decision problem ideally suited for an RL framework. }
+
+% \begin{figure*}
+%   \centering
+%   \begin{subfigure}{0.68\linewidth}
+%     \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+%     \caption{An example of a subfigure.}
+%     \label{fig:short-a}
+%   \end{subfigure}
+%   \hfill
+%   \begin{subfigure}{0.28\linewidth}
+%     \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+%     \caption{Another example of a subfigure.}
+%     \label{fig:short-b}
+%   \end{subfigure}
+%   \caption{Example of a short caption, which should be centered.}
+%   \label{fig:short}
+% \end{figure*}
