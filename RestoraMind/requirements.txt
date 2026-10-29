@@ -1,0 +1,12 @@
+numpy>=1.24
+pillow>=10.0
+opencv-python-headless>=4.8
+pandas>=2.0
+pyarrow>=14.0
+flask>=3.0
+requests>=2.31
+pytest>=8.0
+# 可选：
+#   openai>=1.0      调用 vLLM 部署的多模态智能体
+#   lpips            LPIPS 感知指标
+#   verl             大模型 GRPO 训练（见 scripts/train_verl.sh）
